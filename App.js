@@ -13,7 +13,7 @@ const App = () => {
     const userMessage = { role: "user", content: message };
     const updatedChat = [...chatLog, userMessage];
 
-    const res = await fetch("https://api.openai.com/v1/threads", {
+    const threadRes = await fetch("https://api.openai.com/v1/threads", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
@@ -21,9 +21,9 @@ const App = () => {
       },
       body: JSON.stringify({ messages: [userMessage] })
     });
-    const thread = await res.json();
+    const thread = await threadRes.json();
 
-    const run = await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs`, {
+    const runRes = await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
@@ -31,11 +31,12 @@ const App = () => {
       },
       body: JSON.stringify({ assistant_id: "asst_f8FQkfHZ4UbyjdrfhZ4Jbr9W" })
     });
+    const runData = await runRes.json();
 
     let completed = false;
     let output = "";
     while (!completed) {
-      const status = await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs/${(await run.json()).id}`, {
+      const status = await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs/${runData.id}`, {
         headers: { "Authorization": `Bearer ${apiKey}` }
       });
       const data = await status.json();
